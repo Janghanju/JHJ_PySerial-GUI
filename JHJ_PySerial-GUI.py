@@ -13,7 +13,7 @@ from PySide6.QtGui import QFont, QIcon
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QGroupBox, QLabel, QComboBox, QLineEdit, QPushButton,
-    QTextEdit, QFileDialog, QMessageBox, QStatusBar
+    QTextEdit, QFileDialog, QMessageBox, QStatusBar, QSizePolicy
 )
 import pyqtgraph as pg
 import numpy as np
@@ -246,7 +246,7 @@ class SerialDataloggerApp(QMainWindow):
         manual_layout.setContentsMargins(10, 15, 10, 10)
 
         self.manual_save_btn = QPushButton("Manual Save")
-        self.manual_save_btn.setSizePolicy(QPushButton.sizePolicy(self.manual_save_btn).horizontalPolicy(), QPushButton.QSizePolicy.Expanding)
+        self.manual_save_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.manual_save_btn.clicked.connect(self.save_manual)
         manual_layout.addWidget(self.manual_save_btn)
 
