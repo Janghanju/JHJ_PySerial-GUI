@@ -23,7 +23,10 @@ import numpy as np
 logging.basicConfig(filename='datalogger.log', level=logging.INFO)
 
 # 프로그램이 있는 폴더 경로
-current_folder = os.path.dirname(os.path.abspath(sys.argv[0]))
+if hasattr(sys, '_MEIPASS'):
+    current_folder = sys._MEIPASS
+else:
+    current_folder = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 # 자동 저장 폴더 경로
 auto_save_folder = os.path.join(current_folder, "Auto_Save")
@@ -148,7 +151,7 @@ class SerialDataloggerApp(QMainWindow):
     """현대적인 다크 플랫 테마 스타일의 메인 윈도우 클래스"""
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.0.9")
+        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.1.0")
         self.resize(1100, 900)
 
         # 아이콘 설정
@@ -617,8 +620,6 @@ class SerialDataloggerApp(QMainWindow):
         self.tray_icon = QSystemTrayIcon(self)
         if os.path.exists(self.icon_path):
             self.tray_icon.setIcon(QIcon(self.icon_path))
-        else:
-            self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
             
         self.tray_icon.setToolTip("HelixKorea Serial Datalogger")
 

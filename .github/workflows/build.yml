@@ -35,19 +35,19 @@ jobs:
       - name: Build Application (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --onefile --windowed --icon=logo.ico JHJ_PySerial-GUI.py
+          pyinstaller --onefile --windowed --icon=logo.ico --add-data "logo.ico;." JHJ_PySerial-GUI.py
 
       - name: Build Application (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller --onefile --windowed --name="JHJ_PySerial-GUI-MacOS" JHJ_PySerial-GUI.py
+          pyinstaller --onefile --windowed --name="JHJ_PySerial-GUI-MacOS" --add-data "logo.ico:." JHJ_PySerial-GUI.py
           cd dist
           zip -r JHJ_PySerial-GUI-MacOS.zip JHJ_PySerial-GUI-MacOS.app
 
       - name: Build Application (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pyinstaller --onefile --windowed --name="JHJ_PySerial-GUI-Linux" JHJ_PySerial-GUI.py
+          pyinstaller --onefile --windowed --name="JHJ_PySerial-GUI-Linux" --add-data "logo.ico:." JHJ_PySerial-GUI.py
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
