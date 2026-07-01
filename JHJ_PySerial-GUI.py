@@ -9,11 +9,12 @@ import serial
 from serial.tools import list_ports
 
 from PySide6.QtCore import Qt, QThread, Signal, Slot, QTimer
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtGui import QFont, QIcon, QAction
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QGroupBox, QLabel, QComboBox, QLineEdit, QPushButton,
-    QTextEdit, QFileDialog, QMessageBox, QStatusBar, QSizePolicy
+    QTextEdit, QFileDialog, QMessageBox, QStatusBar, QSizePolicy,
+    QSystemTrayIcon, QMenu, QCheckBox
 )
 import pyqtgraph as pg
 import numpy as np
@@ -147,13 +148,13 @@ class SerialDataloggerApp(QMainWindow):
     """현대적인 다크 플랫 테마 스타일의 메인 윈도우 클래스"""
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.0.6")
+        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.0.7")
         self.resize(1100, 900)
 
         # 아이콘 설정
-        icon_path = os.path.join(current_folder, 'logo.ico')
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
+        self.icon_path = os.path.join(current_folder, 'logo.ico')
+        if os.path.exists(self.icon_path):
+            self.setWindowIcon(QIcon(self.icon_path))
 
         # 전역 상태 변수
         self.receiver_thread = None
@@ -173,6 +174,7 @@ class SerialDataloggerApp(QMainWindow):
         self.setup_ui()
         self.apply_styles()
         self.init_reconnect_timer()
+        self.setup_tray_icon()
 
     def setup_ui(self):
         # 메인 위젯 및 메인 레이아웃
@@ -244,11 +246,17 @@ class SerialDataloggerApp(QMainWindow):
         manual_group = QGroupBox("Manual Save Config")
         manual_layout = QVBoxLayout(manual_group)
         manual_layout.setContentsMargins(10, 15, 10, 10)
+        manual_layout.setSpacing(6)
 
         self.manual_save_btn = QPushButton("Manual Save")
         self.manual_save_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.manual_save_btn.clicked.connect(self.save_manual)
         manual_layout.addWidget(self.manual_save_btn)
+
+        self.chk_minimize_to_tray = QCheckBox("Minimize to Tray on Close")
+        self.chk_minimize_to_tray.setChecked(True)
+        self.chk_minimize_to_tray.setStyleSheet("color: #aaaaaa; font-size: 10px;")
+        manual_layout.addWidget(self.chk_minimize_to_tray)
 
         top_layout.addWidget(manual_group, 2)
 
@@ -604,13 +612,61 @@ class SerialDataloggerApp(QMainWindow):
             line.setData([], [])
         self.status_bar.showMessage("Graph cleared.", 2000)
 
+    def setup_tray_icon(self):
+        """시스템 트레이 아이콘 설정 및 우클릭 메뉴 정의"""
+        self.tray_icon = QSystemTrayIcon(self)
+        if os.path.exists(self.icon_path):
+            self.tray_icon.setIcon(QIcon(self.icon_path))
+        else:
+            self.tray_icon.setIcon(self.style().standardIcon(self.style().SP_ComputerIcon))
+            
+        self.tray_icon.setToolTip("HelixKorea Serial Datalogger")
+
+        # 트레이 메뉴 생성
+        self.tray_menu = QMenu()
+        show_action = QAction("Show Application", self)
+        show_action.triggered.connect(self.showNormal)
+        
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.exit_application)
+
+        self.tray_menu.addAction(show_action)
+        self.tray_menu.addSeparator()
+        self.tray_menu.addAction(exit_action)
+
+        self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.activated.connect(self.on_tray_activated)
+        self.tray_icon.show()
+
+    def on_tray_activated(self, reason):
+        """트레이 아이콘 클릭/더블클릭 시 창 복원"""
+        if reason in (QSystemTrayIcon.Trigger, QSystemTrayIcon.DoubleClick):
+            self.showNormal()
+            self.activateWindow()
+
+    def exit_application(self):
+        """트레이 메뉴 종료 클릭 시 강제 종료 진행"""
+        self.chk_minimize_to_tray.setChecked(False)
+        self.close()
+
     def closeEvent(self, event):
-        """창 종료 시 스레드 자원을 안전하게 회수"""
-        self.port_checker = False
-        if self.receiver_thread:
-            self.receiver_thread.stop()
-            self.receiver_thread.wait()
-        event.accept()
+        """창 닫기 시 트레이 최소화 처리 혹은 자원 안전하게 회수"""
+        if self.chk_minimize_to_tray.isChecked():
+            event.ignore()
+            self.hide()
+            self.tray_icon.showMessage(
+                "HelixKorea Serial Datalogger",
+                "Program minimized to system tray and still running in background.",
+                QSystemTrayIcon.Information,
+                2000
+            )
+        else:
+            self.port_checker = False
+            if self.receiver_thread:
+                self.receiver_thread.stop()
+                self.receiver_thread.wait()
+            self.tray_icon.hide()
+            event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
