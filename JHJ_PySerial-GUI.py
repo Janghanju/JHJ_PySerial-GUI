@@ -151,7 +151,7 @@ class SerialDataloggerApp(QMainWindow):
     """현대적인 다크 플랫 테마 스타일의 메인 윈도우 클래스"""
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.1.0")
+        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.1.1")
         self.resize(1100, 900)
 
         # 아이콘 설정
