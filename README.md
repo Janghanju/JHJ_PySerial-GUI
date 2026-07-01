@@ -72,5 +72,5 @@ python JHJ_PySerial-GUI.py
 * **공정 제어 및 계측**: 센서 측정값 분석, 모터 컨트롤, 액추에이터 제어 자동화 시스템 구축
 
 ### 📬 연락처 및 문의처
-* **프로젝트 의뢰/기술 문의**: [이곳에 이메일 또는 연락처를 기재해 주세요]
+* **프로젝트 의뢰/기술 문의**: hanju1215@naver.com
 * **버그 제보 및 건의 사항**: GitHub [Issues](https://github.com/Janghanju/JHJ_PySerial-GUI/issues)에 남겨주시면 신속하게 조치해 드리겠습니다.
