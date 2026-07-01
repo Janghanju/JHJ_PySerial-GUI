@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QGroupBox, QLabel, QComboBox, QLineEdit, QPushButton,
     QTextEdit, QFileDialog, QMessageBox, QStatusBar, QSizePolicy,
-    QSystemTrayIcon, QMenu, QCheckBox
+    QSystemTrayIcon, QMenu, QCheckBox, QStyle
 )
 import pyqtgraph as pg
 import numpy as np
@@ -148,7 +148,7 @@ class SerialDataloggerApp(QMainWindow):
     """현대적인 다크 플랫 테마 스타일의 메인 윈도우 클래스"""
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.0.8")
+        self.setWindowTitle("[HelixKorea JHJ] Serial Datalogger v1.0.0.9")
         self.resize(1100, 900)
 
         # 아이콘 설정
@@ -618,7 +618,7 @@ class SerialDataloggerApp(QMainWindow):
         if os.path.exists(self.icon_path):
             self.tray_icon.setIcon(QIcon(self.icon_path))
         else:
-            self.tray_icon.setIcon(self.style().standardIcon(self.style().SP_ComputerIcon))
+            self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
             
         self.tray_icon.setToolTip("HelixKorea Serial Datalogger")
 
